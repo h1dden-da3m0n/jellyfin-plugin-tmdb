@@ -32,7 +32,8 @@ jobs:
         uses: technote-space/create-pr-action@v2
         with:
           EXECUTE_COMMANDS: |
-            yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
+            env
+            yq eval '.version = env(VERSION) | .changelog = env(CHANGELOG)' build.yaml
             sed -i **/*.csproj \
               -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
               -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
