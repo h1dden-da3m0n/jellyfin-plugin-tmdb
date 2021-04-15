@@ -32,11 +32,10 @@ jobs:
         uses: technote-space/create-pr-action@v2
         with:
           EXECUTE_COMMANDS: |
-            env
-            yq eval '.version = env(VERSION) | .changelog = env(CHANGELOG)' build.yaml
+            yq eval '.version = "${{ env.VERSION }}" | .changelog = "${{ env.CHANGELOG }}"' build.yaml
             sed -i **/*.csproj \
-              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
-              -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
+              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>;" \
+              -e "s;<FileVersion>.*;<FileVersion>${{ env.VERSION }}</FileVersion>;"
           COMMIT_MESSAGE: 'bump version for ${{ steps.draft.outputs.tag_name }}'
           COMMIT_NAME: 'jellyfin-bot'
           COMMIT_EMAIL: 'team@jellyfin.org'
