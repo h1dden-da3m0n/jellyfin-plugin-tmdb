@@ -1,0 +1,41 @@
+name: Create Release PR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create_release_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Draft
+        uses: release-drafter/release-drafter@v5.15.0
+        id: draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup YQ
+        uses: chrisdickinson/setup-yq@latest
+        with:
+          yq-version: v4.7.0
+
+      - name: Create or Update release PR
+        uses: technote-space/create-pr-action@v2
+        with:
+          EXECUTE_COMMANDS: |
+            TAG="${{ steps.draft.outputs.tag_name }}"
+            CHANGELOG_FULL="${{ steps.draft.outputs.body }}"
+            export VERSION="${TAG#v}.0.0.0"
+            export CHANGELOG="$(echo ${CHANGELOG_FULL} | grep '*')"
+
+            yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
+            sed -i **/*.csproj \
+              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
+              -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
+          COMMIT_MESSAGE: 'bump version for ${{ steps.draft.outputs.tag_name }}'
+          COMMIT_NAME: 'jellyfin-bot'
+          COMMIT_EMAIL: 'team@jellyfin.org'
+          PR_BRANCH_PREFIX: 'release-prep-'
+          PR_BRANCH_NAME: '${{ steps.draft.outputs.tag_name }}'
+          PR_TITLE: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
+          PR_BODY: '${{ steps.draft.outputs.body }}'
+          GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}'
