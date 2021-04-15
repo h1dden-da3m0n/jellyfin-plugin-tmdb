@@ -18,14 +18,20 @@ jobs:
         with:
           yq-version: v4.7.0
 
+      - name: Export draft output as EnvVars
+        run: |
+          TAG="${{ steps.draft.outputs.tag_name }}"
+          cat << EOS >> cl.txt
+          ${{ steps.draft.outputs.body }}
+          EOS;
+          echo "VERSION=${TAG#v}.0.0.0" >> $GITHUB_ENV
+          echo "CHANGELOG='$(cat cl.txt | grep '*')'" >> $GITHUB_ENV
+          rm cl.txt
+
       - name: Create or Update release PR
         uses: technote-space/create-pr-action@v2
         with:
           EXECUTE_COMMANDS: |
-            TAG="${{ steps.draft.outputs.tag_name }}"
-            export VERSION="${TAG#v}.0.0.0"
-            export CHANGELOG="WIP"
-
             yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
             sed -i **/*.csproj \
               -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
