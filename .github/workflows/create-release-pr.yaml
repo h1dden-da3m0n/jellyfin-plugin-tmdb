@@ -19,23 +19,24 @@ jobs:
           yq-version: v4.7.0
 
       - name: Export draft output as EnvVars
+        id: vars
         run: |
           TAG="${{ steps.draft.outputs.tag_name }}"
           cat << EOS >> cl.txt
           ${{ steps.draft.outputs.body }}
           EOS;
-          echo "VERSION=${TAG#v}.0.0.0" >> $GITHUB_ENV
-          echo "CHANGELOG='$(cat cl.txt | grep '*')'" >> $GITHUB_ENV
+          echo "::set-output name=version::$(echo ${TAG#v}.0.0.0)"
+          echo "::set-output name=changelog::$(cat cl.txt | grep '*')"
           rm cl.txt
 
       - name: Create or Update release PR
         uses: technote-space/create-pr-action@v2
         with:
           EXECUTE_COMMANDS: |
-            yq eval '.version = "${{ env.VERSION }}" | .changelog = "${{ env.CHANGELOG }}"' build.yaml
+            yq eval '.version = "${{ steps.draft.outputs.version }}" | .changelog = "${{ steps.draft.outputs.changelog }}"' build.yaml
             sed -i **/*.csproj \
-              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${{ env.VERSION }}</AssemblyVersion>;" \
-              -e "s;<FileVersion>.*;<FileVersion>${{ env.VERSION }}</FileVersion>;"
+              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${{ steps.draft.outputs.version }}</AssemblyVersion>;" \
+              -e "s;<FileVersion>.*;<FileVersion>${{ steps.draft.outputs.version }}</FileVersion>;"
           COMMIT_MESSAGE: 'bump version for ${{ steps.draft.outputs.tag_name }}'
           COMMIT_NAME: 'jellyfin-bot'
           COMMIT_EMAIL: 'team@jellyfin.org'
