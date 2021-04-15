@@ -23,9 +23,12 @@ jobs:
         with:
           EXECUTE_COMMANDS: |
             TAG="${{ steps.draft.outputs.tag_name }}"
-            CHANGELOG_FULL="${{ steps.draft.outputs.body }}"
+            cat << EOF >> cl.txt
+            ${{ steps.draft.outputs.body }}
+            EOF;
             export VERSION="${TAG#v}.0.0.0"
-            export CHANGELOG="$(echo ${CHANGELOG_FULL} | grep '*')"
+            export CHANGELOG="$(cat cl.txt | grep '*')"
+            rm cl.txt
 
             yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
             sed -i **/*.csproj \
