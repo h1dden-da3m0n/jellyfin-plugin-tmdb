@@ -38,4 +38,4 @@ jobs:
           PR_BRANCH_NAME: '${{ steps.draft.outputs.tag_name }}'
           PR_TITLE: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
           PR_BODY: '${{ steps.draft.outputs.body }}'
-          GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
