@@ -32,7 +32,7 @@ jobs:
           rm cl.md
           env | grep CHANGELOG
 
-          yq eval '.version = env(VERSION) | .changelog = env(CHANGELOG) style="literal"' -i build.yaml
+          yq eval '.version = env(VERSION) | .changelog = strenv(CHANGELOG) | .changelogg style="literal"' -i build.yaml
           sed -i **/*.csproj \
             -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
             -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
