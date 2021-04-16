@@ -30,8 +30,9 @@ jobs:
           export VERSION="${TAG#v}.0.0.0"
           export CHANGELOG="$(cat cl.md | grep '*')"
           rm cl.md
+          env | grep CHANGELOG
 
-          yq eval ".version = env(VERSION)" build.yaml
+          yq eval '.version = env(VERSION) | .changelog = env(CHANGELOG) style="literal"' -i build.yaml
           sed -i **/*.csproj \
             -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
             -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
