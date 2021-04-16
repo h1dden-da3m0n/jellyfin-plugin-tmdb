@@ -18,30 +18,34 @@ jobs:
         with:
           yq-version: v4.7.0
 
-      - name: Export draft output as EnvVars
-        id: vars
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Prep Release
         run: |
           TAG="${{ steps.draft.outputs.tag_name }}"
-          cat << EOS >> cl.txt
-          ${{ steps.draft.outputs.body }}
-          EOS;
-          echo "::set-output name=version::$(echo ${TAG#v}.0.0.0)"
-          echo "::set-output name=changelog::$(cat cl.txt | grep '*')"
-          rm cl.txt
+          CHANGELOG_FULL="${{ steps.draft.outputs.body }}"
+          export VERSION="${TAG#v}.0.0.0"
+          export CHANGELOG="$(echo ${CHANGELOG_FULL} | grep '*')"
 
-      - name: Create or Update release PR
-        uses: technote-space/create-pr-action@v2
-        with:
-          EXECUTE_COMMANDS: |
-            yq eval '.version = "${{ steps.draft.outputs.version }}" | .changelog = "${{ steps.draft.outputs.changelog }}"' build.yaml
-            sed -i **/*.csproj \
-              -e "s;<AssemblyVersion>.*;<AssemblyVersion>${{ steps.draft.outputs.version }}</AssemblyVersion>;" \
-              -e "s;<FileVersion>.*;<FileVersion>${{ steps.draft.outputs.version }}</FileVersion>;"
-          COMMIT_MESSAGE: 'bump version for ${{ steps.draft.outputs.tag_name }}'
-          COMMIT_NAME: 'jellyfin-bot'
-          COMMIT_EMAIL: 'team@jellyfin.org'
-          PR_BRANCH_PREFIX: 'release-prep-'
-          PR_BRANCH_NAME: '${{ steps.draft.outputs.tag_name }}'
-          PR_TITLE: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
-          PR_BODY: '${{ steps.draft.outputs.body }}'
+          yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
+          sed -i **/*.csproj \
+            -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
+            -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
+          
+      - name: create or update PR
+        uses: gr2m/create-or-update-pull-request-action@v1
+        env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        with:
+          title: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
+          body: |
+            :robot: This PR was automatically created as a preration for the next plugin release.
+
+            ---
+
+            ${{ steps.draft.outputs.body }}
+          branch: "release-prep-${{ steps.draft.outputs.tag_name }}"
+          commit-message: 'bump version for ${{ steps.draft.outputs.tag_name }}'
+          author: "jellyfin-bot <team@jellyfin.org>"
+          labels:  'release-prep, skip-changelog'
