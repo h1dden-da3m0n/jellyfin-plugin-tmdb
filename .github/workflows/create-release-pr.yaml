@@ -24,11 +24,12 @@ jobs:
       - name: Prep Release
         run: |
           TAG="${{ steps.draft.outputs.tag_name }}"
-          CHANGELOG_FULL=&(cat << EOS
+          cat << EOS >> cl.md
           ${{ steps.draft.outputs.body }}
           EOS)
           export VERSION="${TAG#v}.0.0.0"
-          export CHANGELOG="$(echo ${CHANGELOG_FULL} | grep '*')"
+          export CHANGELOG="$(cat cl.md | grep '*')"
+          rm cl.md
 
           yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
           sed -i **/*.csproj \
