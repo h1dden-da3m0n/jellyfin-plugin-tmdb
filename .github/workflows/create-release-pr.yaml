@@ -31,7 +31,7 @@ jobs:
           export CHANGELOG="$(cat cl.md | grep '*')"
           rm cl.md
 
-          yq eval ".version = env(VERSION) | .changelog = env(CHANGELOG)" build.yaml
+          yq eval ".version = env(VERSION)" build.yaml
           sed -i **/*.csproj \
             -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
             -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
