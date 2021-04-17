@@ -11,7 +11,7 @@ jobs:
       - name: Notify as seen
         uses: peter-evans/create-or-update-comment@v1.4.5
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ github.event.comment.id }}
           edit-mode: replace
           reactions: '+1'
