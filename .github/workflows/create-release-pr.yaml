@@ -18,29 +18,31 @@ jobs:
         with:
           yq-version: v4.7.0
 
+      - name: Pars Changhelog
+        run: |
+          cat << EOS >> cl.md
+          ${{ steps.draft.outputs.body }}
+          EOS
+          echo "CHANGELOG=`cat cl.md | grep '*'`" >> $GITHUB_ENV
+          rm cl.md
+
       - name: Checkout Repo
         uses: actions/checkout@v2
 
       - name: Prep Release
         run: |
           TAG="${{ steps.draft.outputs.tag_name }}"
-          cat << EOS >> cl.md
-          ${{ steps.draft.outputs.body }}
-          EOS
           export VERSION="${TAG#v}.0.0.0"
-          export CHANGELOG="$(cat cl.md | grep '*')"
-          rm cl.md
-          env | grep CHANGELOG
 
-          yq eval '.version = env(VERSION) | .changelog = strenv(CHANGELOG) | .changelogg style="literal"' -i build.yaml
+          yq eval '.version = env(VERSION) | .changelog = strenv(CHANGELOG) | .changelog style="literal"' -i build.yaml
           sed -i **/*.csproj \
             -e "s;<AssemblyVersion>.*;<AssemblyVersion>${VERSION}</AssemblyVersion>;" \
             -e "s;<FileVersion>.*;<FileVersion>${VERSION}</FileVersion>;"
-          
+
       - name: create or update PR
         uses: gr2m/create-or-update-pull-request-action@v1
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}'
         with:
           title: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
           body: |
@@ -48,7 +50,11 @@ jobs:
 
             ---
 
-            ${{ steps.draft.outputs.body }}
+            ${{ env.CHANGELOG }}
+
+            ---
+
+            :robot: as a team member comment `@jellyfin-bot release` to merge this and trigger a release
           branch: "release-prep-${{ steps.draft.outputs.tag_name }}"
           commit-message: 'bump version for ${{ steps.draft.outputs.tag_name }}'
           author: "jellyfin-bot <team@jellyfin.org>"
