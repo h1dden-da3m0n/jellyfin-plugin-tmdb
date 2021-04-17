@@ -17,7 +17,7 @@ jobs:
           reactions: '+1'
 
       - name: Try Merge PR
-        uses: squalrus/merge-bot@v0.1.0
+        uses: squalrus/merge-bot@v0.4.4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           test: true
