@@ -42,7 +42,7 @@ jobs:
       - name: create or update PR
         uses: gr2m/create-or-update-pull-request-action@v1
         env:
-          GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         with:
           title: 'Prepare for release ${{ steps.draft.outputs.tag_name }}'
           body: |
