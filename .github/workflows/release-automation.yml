@@ -5,7 +5,7 @@ on:
 
 jobs:
   merge_release_prepr_pr:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '@jellyfin-bot rebase') && github.event.comment.author_association == 'MEMBER' }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '@h1dden-bot release') }}
     runs-on: ubuntu-latest
     steps:
       - name: Notify as seen
