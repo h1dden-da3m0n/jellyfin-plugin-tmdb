@@ -17,16 +17,13 @@ jobs:
           reactions: '+1'
 
       - name: Try Merge PR
-        uses: squalrus/merge-bot@v0.4.4
+        uses: KeisukeYamashita/auto-pull-request-merge@v1.0.5
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          test: true
-          reviewers: true
-          labels: ''
-          blocking_labels: do_not_merge
-          checks_enabled: true
-          method: squash
-          delete_source_branch: true
+          dryRun: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          failStep: false
+          intervalSeconds: 60
+          pullRequestNumber: ${{ github.event.issue.number }}
 
   release_new_version:
     needs: merge_release_prepr_pr
