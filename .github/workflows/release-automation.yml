@@ -1,0 +1,37 @@
+name: Release Automation
+
+on:
+  issue_comment:
+
+jobs:
+  merge_release_prepr_pr:
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '@jellyfin-bot rebase') && github.event.comment.author_association == 'MEMBER' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify as seen
+        uses: peter-evans/create-or-update-comment@v1.4.5
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
+          edit-mode: replace
+          reactions: '+1'
+
+      - name: Try Merge PR
+        uses: squalrus/merge-bot@v0.1.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          test: true
+          reviewers: true
+          labels: ''
+          blocking_labels: do_not_merge
+          checks_enabled: true
+          method: squash
+          delete_source_branch: true
+
+  release_new_version:
+    needs: merge_release_prepr_pr
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - run: echo "wip"
