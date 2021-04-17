@@ -18,7 +18,6 @@ jobs:
 
       - name: Try Merge PR
         uses: reitermarkus/automerge@v1.5.1
-        continue-on-error: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           merge-method: merge
