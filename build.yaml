@@ -1,6 +1,7 @@
 ---
 name: "TheMovieDb"
 guid: "963FD785-53E7-440C-80BD-71661BE1B7DF"
+imageUrl: "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-tmdb.png"
 version: "1.0.0.0"
 targetAbi: "10.7.0.0"
 framework: "net5.0"
@@ -10,7 +11,8 @@ description: >
   Get metadata from TheMovieDb
 category: "Metadata"
 artifacts:
-- "Jellyfin.Plugin.Tmdb.dll"
-- "TMDbLib.dll"
-changelog: >
-  Remove from Jellyfin core.
+  - "Jellyfin.Plugin.Tmdb.dll"
+  - "TMDbLib.dll"
+changelog: |
+  * initial release
+  * split of from Jellyfin core.
