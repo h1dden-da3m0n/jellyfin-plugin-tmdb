@@ -17,7 +17,7 @@ jobs:
           reactions: '+1'
 
       - name: Try Merge PR
-        uses: reitermarkus/automerge@v1.5.1
+        uses: reitermarkus/automerge@v1.5.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           merge-method: merge
