@@ -2,15 +2,31 @@
 name: "TheMovieDb"
 guid: "963FD785-53E7-440C-80BD-71661BE1B7DF"
 version: "1.0.0.0"
-targetAbi: "10.7.0.0"
+targetAbi: "10.7.7.0"
 framework: "net5.0"
 owner: "jellyfin"
 overview: "Get metadata from TheMovieDb"
 description: >
   Get metadata from TheMovieDb
+
 category: "Metadata"
 artifacts:
-- "Jellyfin.Plugin.Tmdb.dll"
-- "TMDbLib.dll"
-changelog: >
-  Remove from Jellyfin core.
+  - "Jellyfin.Plugin.Tmdb.dll"
+  - "TMDbLib.dll"
+changelog: |-
+  - chore(deps): bump TMDbLib from 1.8.0 to 1.8.1 (#9) @dependabot
+  - chore(deps): bump release-drafter/release-drafter from v5.14.0 to v5.15.0 (#6) @dependabot
+  - chore(deps): bump TMDbLib from 1.7.3-alpha to 1.8.0 (#7) @dependabot
+  - chore(ci): builds, releas drafter and more (#2) @h1dden-da3m0n
+
+  ### Bug Fixes ###
+  - Remove season name from metadata result (#1) @Larvitar
+
+  ### Code or Repo Maintenance ###
+  - Use meta ci (#21) @crobibero
+
+  ### CI & build changes ###
+  - Use meta ci (#21) @crobibero
+  - Update ci (#13) @h1dden-da3m0n
+  - chore(build): update analyzers (#8) @h1dden-da3m0n
+  - fix bad download url template (#4) @h1dden-da3m0n
